@@ -1,0 +1,12 @@
+dataset,variable,type,pandas_dtype
+social_profiles,customer_id_new,categorical,str
+social_profiles,social_media_platform,categorical,str
+social_profiles,engagement_score,numeric,int64
+social_profiles,purchase_interest_score,numeric,float64
+social_profiles,review_sentiment,date,str
+customer_transactions,customer_id_legacy,numeric,int64
+customer_transactions,transaction_id,numeric,int64
+customer_transactions,purchase_amount,numeric,int64
+customer_transactions,purchase_date,date,datetime64[us]
+customer_transactions,product_category,categorical,str
+customer_transactions,customer_rating,numeric,float64
