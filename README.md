@@ -72,10 +72,10 @@ Notebooks can be opened from anywhere; they switch to the repo root automaticall
 
 ## Privacy
 
-This repo contains photos and voice recordings of team members. Keep the repository **private** and share it only with the team and instructor.
+This repo contains photos and voice recordings of team members. We Kept it **private** And It will be only shared among team members and instructor(s).
 
 ## Contributions
 
 Each member adds a short paragraph on their own contribution below.
 
-- **Task 2 (Chriss):** collected and standardized the facial images (3 expressions per member), preprocessed them (face crop, 128x128, grayscale), applied five augmentations (rotation +/-15 degrees, flip, Gaussian blur, brightness), extracted intensity-histogram and HOG features into `data/image_features.csv`, and wrote `src/image_pipeline.py` and `notebooks/task2_image_processing.ipynb`.
+- **Task 2 (Robert):** collected and standardized the facial images (3 expressions per member), preprocessed them (face crop, 128x128, grayscale), applied five augmentations (rotation +/-15 degrees, flip, Gaussian blur, brightness), extracted intensity-histogram and HOG features into `data/image_features.csv`, and wrote `src/image_pipeline.py` and `notebooks/task2_image_processing.ipynb`.
