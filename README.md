@@ -23,13 +23,13 @@ Team members whose face and voice are in the dataset: **Elox, Aderline, Sandrine
 ## Repository layout
 
 ```
-data/        raw CSVs, merged_dataset.csv, image_features.csv, audio_features.csv, member_customer_map.csv
+data/        source workbooks, clean_merged_customer_dataset.csv, image_features.csv, audio_features.csv, member_customer_map.csv
 images/      <member>_<neutral|smiling|surprised>.jpg
 images/unauthorized/   photo(s) of someone NOT on the team (demo only)
 audio/       <member>_<yes_approve|confirm_transaction>.wav
 audio/unauthorized/    recording(s) of someone NOT on the team (demo only)
-notebooks/   one notebook per task (task2_image_processing.ipynb, ...)
-src/         pipelines, training scripts, and the CLI app
+notebooks/   one notebook per task (task1_customer_data_eda_cleaning_product_model.ipynb, task2_image_processing.ipynb, ...)
+src/         pipelines and the CLI app for the other system stages
 models/      trained models (*.pkl are git-ignored; rebuild with the train scripts)
 reports/     figures/ and metrics.json
 ```
@@ -50,14 +50,23 @@ pip install -r requirements.txt
 ## Run order
 
 ```bash
-python src/merge_data.py --social data/customer_social_profiles.csv --transactions data/customer_transactions.csv
+jupyter nbconvert --to notebook --execute notebooks/task1_customer_data_eda_cleaning_product_model.ipynb
 python src/image_pipeline.py        # -> data/image_features.csv
 python src/audio_pipeline.py        # -> data/audio_features.csv
 python src/train_face.py
 python src/train_voice.py
-python src/train_product.py
-python src/app.py --demo            # authorized + unauthorized attempts
+python src/app.py --demo             # authorized + unauthorized attempts
 ```
+
+The data-lead notebook writes `data/clean_merged_customer_dataset.csv`,
+`reports/clean_merged_customer_summary_statistics.csv`,
+`reports/clean_merged_customer_dataset_info.txt`,
+`reports/clean_merged_customer_variable_types.csv`, three named plots, and
+`reports/product_recommendation_model_metrics.json`. The merge uses an inner
+join after normalizing `customer_id_new` and `customer_id_legacy`. Product
+metrics include accuracy, macro-F1, and log loss. Duplicate social profiles
+for one normalized customer are reduced to one profile before joining to avoid
+many-to-many row inflation.
 
 Notebooks can be opened from anywhere; they switch to the repo root automatically.
 
@@ -79,3 +88,4 @@ This repo contains photos and voice recordings of team members. We Kept it **pri
 Each member adds a short paragraph on their own contribution below.
 
 - **Task 2 (Robert):** collected and standardized the facial images (3 expressions per member), preprocessed them (face crop, 128x128, grayscale), applied five augmentations (rotation +/-15 degrees, flip, Gaussian blur, brightness), extracted intensity-histogram and HOG features into `data/image_features.csv`, and wrote `src/image_pipeline.py` and `notebooks/task2_image_processing.ipynb`.
+- **Task 1 (Data Lead):** completed in `notebooks/task1_customer_data_eda_cleaning_product_model.ipynb`; cleaned and merged the supplied workbooks, generated EDA summaries and labeled plots under `reports/`, and trained the Random Forest product model.
