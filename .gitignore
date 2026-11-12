@@ -7,6 +7,7 @@ venv/
 
 # Trained models are rebuilt with the train_*.py scripts
 models/*.pkl
+models/*.joblib
 
 # OS / editor
 .DS_Store
