@@ -1,0 +1,3 @@
+source_file,predicted_member,confidence,distance,within_stored_radius
+outsider_confirm_transaction.wav,sandrine,0.5133333333333333,1.058745016774593,True
+outsider_yes_approve.wav,sandrine,0.5266666666666666,1.004428381898898,True

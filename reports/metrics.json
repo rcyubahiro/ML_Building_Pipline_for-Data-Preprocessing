@@ -1,0 +1,63 @@
+{
+  "product_model": {
+    "selected": "random_forest",
+    "cv": {
+      "logistic_regression": {
+        "accuracy": 0.20833333333333334,
+        "f1_macro": 0.199316374429582,
+        "log_loss": 2.101008663993229
+      },
+      "random_forest": {
+        "accuracy": 0.2833333333333333,
+        "f1_macro": 0.28520821063193946,
+        "log_loss": 1.7401960574420665
+      }
+    },
+    "holdout_test": {
+      "accuracy": 0.16666666666666666,
+      "f1_macro": 0.14903762903762902,
+      "log_loss": 1.9072239501104595
+    },
+    "majority_baseline_accuracy": 0.23333333333333334
+  },
+  "voice_model": {
+    "selected": "random_forest",
+    "cv": {
+      "logistic_regression": {
+        "accuracy": 0.421875,
+        "f1_macro": 0.4389978213507625,
+        "log_loss": 18.208284731454537
+      },
+      "random_forest": {
+        "accuracy": 0.46875,
+        "f1_macro": 0.47575757575757577,
+        "log_loss": 18.305516134449455
+      }
+    },
+    "validation_group": "source_file",
+    "threshold": 0.5,
+    "open_set_radius": 4.316001854382816,
+    "genuine_radius_95": 4.316001854382816,
+    "unknown_calibrated": false,
+    "unknown_source_count": 0,
+    "outsider_evaluation_count": 2,
+    "calibration_note": "No outsider recordings supplied; unknown-speaker rejection is uncalibrated."
+  },
+  "face_model": {
+    "selected": "random_forest",
+    "cv": {
+      "logistic_regression": {
+        "accuracy": 0.9444444444444444,
+        "f1_macro": 0.94375,
+        "log_loss": 0.16956993013297658
+      },
+      "random_forest": {
+        "accuracy": 0.9583333333333334,
+        "f1_macro": 0.9582670906200318,
+        "log_loss": 0.6323242846914611
+      }
+    },
+    "threshold": 0.5,
+    "open_set_radius": 1.3811510059071037
+  }
+}

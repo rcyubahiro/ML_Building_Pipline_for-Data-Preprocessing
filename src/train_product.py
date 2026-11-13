@@ -11,7 +11,9 @@ from sklearn.model_selection import train_test_split
 
 from common import candidate_models, pick_best, print_results, save_metrics, score
 
-DROP = ["customer_id", "transaction_id", "purchase_date", "amount_bucket", "product_category"]
+# customer_id_legacy is the canonical identifier; it is excluded from model features.
+DROP = ["customer_id_legacy", "customer_id", "transaction_id", "purchase_date",
+        "amount_bucket", "product_category"]
 TARGET = "product_category"
 
 
