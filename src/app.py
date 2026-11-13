@@ -26,7 +26,8 @@ from image_pipeline import crop_face, extract_features as image_features  # noqa
 from common import open_set_distance  # noqa: E402
 from train_product import build_X  # noqa: E402
 
-MODELS = Path("models")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+MODELS = PROJECT_ROOT / "models"
 
 
 def load_bundle(name):
@@ -34,6 +35,19 @@ def load_bundle(name):
     if not p.exists():
         sys.exit(f"Missing {p}. Run the train_*.py scripts first.")
     return joblib.load(p)
+
+
+def validate_bundle(name, bundle):
+    required = {"model", "features", "classes"}
+    missing = required - set(bundle)
+    if missing:
+        raise ValueError(f"{name} is missing bundle fields: {sorted(missing)}")
+    if not hasattr(bundle["model"], "predict_proba"):
+        raise TypeError(f"{name} does not expose predict_proba()")
+    sample = pd.DataFrame([[0.0] * len(bundle["features"])], columns=bundle["features"])
+    probabilities = bundle["model"].predict_proba(sample)
+    if probabilities.shape[1] != len(bundle["classes"]):
+        raise ValueError(f"{name} class count does not match predict_proba() output")
 
 
 def top_prediction(bundle, feats):
@@ -91,11 +105,8 @@ def run_transaction(face_path, voice_path, face_b, voice_b, prod_b, merged, cmap
         print(f"    -> ACCESS DENIED: no customer account linked to '{member}'.")
         return False
     cid = cmap[member]
-    ranking = recommend(cid, prod_b, merged)
-    print(f"[2] Product model ran for customer {cid} (result held until voice is verified).")
-
     speaker, vconf, vdist = verify_voice(voice_path, voice_b)
-    print(f"[3] Voice validation: closest speaker '{speaker}' (confidence {vconf:.2f} "
+    print(f"[2] Voice validation: closest speaker '{speaker}' (confidence {vconf:.2f} "
           f"vs {voice_b['threshold']:.2f}; distance {vdist:.2f} vs limit {voice_b['open_set']['radius']:.2f})")
     if not accepted(vconf, vdist, voice_b) or speaker != member:
         why = ("voice does not match the recognised face" if speaker != member
@@ -104,6 +115,8 @@ def run_transaction(face_path, voice_path, face_b, voice_b, prod_b, merged, cmap
         return False
     print("    -> Voice approved.")
 
+    ranking = recommend(cid, prod_b, merged)
+    print(f"[3] Product recommendation model ran for customer {cid}.")
     print(f"[4] PREDICTED PRODUCT for {member}: {ranking[0][0]} (p={ranking[0][1]:.2f})")
     print("    Other likely categories: " + ", ".join(f"{c} ({p:.2f})" for c, p in ranking[1:3]))
     return True
@@ -137,13 +150,18 @@ def main():
     ap.add_argument("--face"); ap.add_argument("--voice")
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--images", default="images"); ap.add_argument("--audio", default="audio")
-    ap.add_argument("--merged", default="data/merged_dataset.csv")
+    ap.add_argument("--merged", default="data/clean_merged_customer_dataset.csv")
     ap.add_argument("--map", default="data/member_customer_map.csv")
     args = ap.parse_args()
 
     face_b, voice_b, prod_b = (load_bundle(n) for n in
                                ("face_model.pkl", "voice_model.pkl", "product_model.pkl"))
+    for name, bundle in (("face_model.pkl", face_b), ("voice_model.pkl", voice_b),
+                         ("product_model.pkl", prod_b)):
+        validate_bundle(name, bundle)
     merged = pd.read_csv(args.merged, parse_dates=["purchase_date"])
+    if "customer_id" not in merged and "customer_id_legacy" in merged:
+        merged = merged.rename(columns={"customer_id_legacy": "customer_id"})
     cmap = dict(pd.read_csv(args.map).values)
 
     if args.demo:

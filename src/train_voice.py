@@ -1,45 +1,112 @@
-"""Voiceprint verification model: audio_features.csv -> which member is speaking?
+"""Task 3 – train the voice verification model.
 
-Validation: grouped CV where each fold holds out ONE PHRASE (train on 'yes approve', test on
-'confirm transaction' and vice versa), including augmented copies of the held-out recordings.
+Reads data/audio_features.csv, evaluates with a leave-one-phrase-out split
+(train on one phrase, test on the other, both directions), then fits the
+final model on all rows and saves models/voice_model.pkl plus
+reports/voice_model_metrics.json.
 
-    python src/train_voice.py
+Why leave-one-phrase-out: augmented copies of one recording are near
+duplicates. A random row split would put copies of the same clip in train
+and test and inflate the scores. Holding out a whole phrase tests whether
+the model recognises the *speaker* on words it has not heard.
+
+Run from the repo root:  python src/train_voice.py
 """
-import argparse
+import json
+import sys
 from pathlib import Path
 
 import joblib
+import numpy as np
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, log_loss
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
-from common import candidate_models, fit_open_set, pick_best, print_results, save_metrics
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from audio_pipeline import (FEATURES_CSV, FEATURE_COLUMNS, PHRASES, PROJECT_ROOT, SEED,
+                            UNAUTHORIZED_DIR, list_recordings, verify_voice)
+from common import fit_open_set
 
-META = ["member", "phrase", "source_file", "augmentation"]
+MODEL_PATH = PROJECT_ROOT / "models" / "voice_model.pkl"
+METRICS_PATH = PROJECT_ROOT / "reports" / "voice_model_metrics.json"
+HYPERPARAMS = {"n_estimators": 300, "max_depth": None, "min_samples_leaf": 1, "random_state": SEED}
+
+
+def make_model():
+    return Pipeline([("scaler", StandardScaler()),
+                     ("classifier", RandomForestClassifier(**HYPERPARAMS))])
+
+
+def evaluate(df):
+    """Train on one phrase, test on the other; returns per-fold results."""
+    folds = []
+    labels = sorted(df["member"].unique())
+    for test_phrase in PHRASES:
+        train, test = df[df.phrase != test_phrase], df[df.phrase == test_phrase]
+        if train.empty or test.empty:
+            continue
+        model = make_model().fit(train[FEATURE_COLUMNS], train["member"])
+        pred = model.predict(test[FEATURE_COLUMNS])
+        proba = model.predict_proba(test[FEATURE_COLUMNS])
+        folds.append({
+            "train_phrase": train.phrase.iloc[0], "test_phrase": test_phrase,
+            "train_rows": len(train), "test_rows": len(test),
+            "accuracy": float(accuracy_score(test.member, pred)),
+            "f1_macro": float(f1_score(test.member, pred, average="macro", zero_division=0)),
+            "log_loss": float(log_loss(test.member, proba, labels=model.classes_)),
+            "genuine_confidence_min": float(proba.max(axis=1).min()),
+            "confusion_matrix": confusion_matrix(test.member, pred, labels=labels).tolist(),
+            "labels": labels,
+            "y_true": test.member.tolist(), "y_pred": pred.tolist(),
+        })
+    return folds
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--features", default="data/audio_features.csv")
-    ap.add_argument("--out", default="models/voice_model.pkl")
-    ap.add_argument("--threshold", type=float, default=0.5,
-                    help="minimum predicted probability to accept a voice")
-    a = ap.parse_args()
+    df = pd.read_csv(FEATURES_CSV)
+    folds = evaluate(df)
+    summary = {k: float(np.mean([f[k] for f in folds])) for k in ("accuracy", "f1_macro", "log_loss")}
 
-    df = pd.read_csv(a.features)
-    X, y, groups = df.drop(columns=META), df["member"], df["phrase"]
-    print(f"{len(df)} rows, {X.shape[1]} features, members={sorted(y.unique())}")
+    final_model = make_model().fit(df[FEATURE_COLUMNS], df["member"])
+    open_set = fit_open_set(df[FEATURE_COLUMNS], df["member"], df["phrase"])
 
-    best, results = pick_best(X, y, groups)
-    print_results("Voice model (leave-one-phrase-out CV)", best, results)
+    # Confidence threshold for accepting a voice: the lowest top-class
+    # probability the model gave a *genuine* held-out clip, so known members
+    # are still accepted. Outsider clips are reported against it.
+    # Keep the CV-derived floor, but require a stronger match for the
+    # transaction gate so low-confidence outsider predictions are rejected.
+    threshold = max(
+        0.75,
+        round(min(f["genuine_confidence_min"] for f in folds), 2),
+    ) if folds else 0.75
+    outsiders = []
+    if UNAUTHORIZED_DIR.exists():
+        for path in list_recordings(UNAUTHORIZED_DIR):
+            outsiders.append({"file": path.name, **verify_voice(path, final_model, threshold)})
 
-    model = candidate_models()[best]().fit(X, y)
-    open_set = fit_open_set(X, y, groups)
-    print(f"Open-set rejection radius (RMS z-distance): {open_set['radius']:.3f}")
-    Path(a.out).parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump({"model": model, "features": list(X.columns), "threshold": a.threshold,
-                 "classes": list(model.classes_), "name": best, "open_set": open_set}, a.out)
-    save_metrics("voice_model", {"selected": best, "cv": results, "threshold": a.threshold,
-                                 "open_set_radius": open_set["radius"]})
-    print(f"Saved {a.out}")
+    MODEL_PATH.parent.mkdir(exist_ok=True); METRICS_PATH.parent.mkdir(exist_ok=True)
+    joblib.dump({
+        "model": final_model,
+        "features": FEATURE_COLUMNS,
+        "threshold": threshold,
+        "classes": list(final_model.classes_),
+        "name": "random_forest",
+        "open_set": open_set,
+    }, MODEL_PATH)
+    metrics = {
+        "model": "voice_verification", "algorithm": "RandomForestClassifier (StandardScaler first)",
+        "hyperparameters": HYPERPARAMS, "split": "leave-one-phrase-out (train on one phrase, test on the other)",
+        "members": sorted(df.member.unique()), "rows": len(df), "features": len(FEATURE_COLUMNS),
+        "mean_over_folds": summary,
+        "folds": [{k: v for k, v in f.items() if k not in ("y_true", "y_pred")} for f in folds],
+        "acceptance_threshold": threshold, "unauthorized_checks": outsiders,
+    }
+    METRICS_PATH.write_text(json.dumps(metrics, indent=2))
+    print(json.dumps({k: metrics[k] for k in ("members", "rows", "mean_over_folds",
+                                               "acceptance_threshold", "unauthorized_checks")}, indent=2))
+    return metrics, folds, final_model
 
 
 if __name__ == "__main__":

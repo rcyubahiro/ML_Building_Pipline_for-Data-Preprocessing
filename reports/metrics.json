@@ -1,0 +1,40 @@
+{
+  "product_model": {
+    "selected": "random_forest",
+    "cv": {
+      "logistic_regression": {
+        "accuracy": 0.24731182795698925,
+        "f1_macro": 0.23130543546238141,
+        "log_loss": 1.950278463154389
+      },
+      "random_forest": {
+        "accuracy": 0.3010752688172043,
+        "f1_macro": 0.30220261437908497,
+        "log_loss": 1.6640333274536172
+      }
+    },
+    "holdout_test": {
+      "accuracy": 0.2916666666666667,
+      "f1_macro": 0.2458430458430459,
+      "log_loss": 1.959790937847057
+    },
+    "majority_baseline_accuracy": 0.23931623931623933
+  },
+  "face_model": {
+    "selected": "logistic_regression",
+    "cv": {
+      "logistic_regression": {
+        "accuracy": 1.0,
+        "f1_macro": 1.0,
+        "log_loss": 0.012643334829167508
+      },
+      "random_forest": {
+        "accuracy": 1.0,
+        "f1_macro": 1.0,
+        "log_loss": 0.2288475132033295
+      }
+    },
+    "threshold": 0.5,
+    "open_set_radius": 1.3804591957223595
+  }
+}

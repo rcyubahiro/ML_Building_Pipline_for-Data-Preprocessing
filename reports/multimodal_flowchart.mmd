@@ -1,0 +1,9 @@
+flowchart TD
+    A[Start transaction] --> B[Load face image and voice clip]
+    B --> C{Face recognised?}
+    C -- No --> D[Access denied: face not recognised]
+    C -- Yes --> E{Voice matches recognised member?}
+    E -- No --> F[Access denied: voice not verified]
+    E -- Yes --> G[Load linked customer record]
+    G --> H[Product model predicts recommendation]
+    H --> I[Display recommended product]

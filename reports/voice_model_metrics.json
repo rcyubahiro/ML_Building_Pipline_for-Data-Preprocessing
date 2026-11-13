@@ -17,9 +17,9 @@
   "rows": 64,
   "features": 32,
   "mean_over_folds": {
-    "accuracy": 0.734375,
-    "f1_macro": 0.6857944627126213,
-    "log_loss": 0.9243269884482519
+    "accuracy": 0.71875,
+    "f1_macro": 0.6506353265944058,
+    "log_loss": 0.9309461900637845
   },
   "folds": [
     {
@@ -28,15 +28,15 @@
       "train_rows": 32,
       "test_rows": 32,
       "accuracy": 0.71875,
-      "f1_macro": 0.673492875411034,
-      "log_loss": 0.9734306961634523,
-      "genuine_confidence_min": 0.31,
+      "f1_macro": 0.665976535541753,
+      "log_loss": 0.9900135947067061,
+      "genuine_confidence_min": 0.2866666666666667,
       "confusion_matrix": [
         [
           6,
-          1,
+          2,
           0,
-          1
+          0
         ],
         [
           0,
@@ -69,9 +69,9 @@
       "test_phrase": "confirm_transaction",
       "train_rows": 32,
       "test_rows": 32,
-      "accuracy": 0.75,
-      "f1_macro": 0.6980960500142086,
-      "log_loss": 0.8752232807330514,
+      "accuracy": 0.71875,
+      "f1_macro": 0.6352941176470588,
+      "log_loss": 0.8718787854208631,
       "genuine_confidence_min": 0.29333333333333333,
       "confusion_matrix": [
         [
@@ -93,10 +93,10 @@
           0
         ],
         [
-          7,
+          8,
           0,
           0,
-          1
+          0
         ]
       ],
       "labels": [
@@ -107,19 +107,19 @@
       ]
     }
   ],
-  "acceptance_threshold": 0.29,
+  "acceptance_threshold": 0.75,
   "unauthorized_checks": [
     {
       "file": "outsider_confirm_transaction.wav",
       "predicted_member": "aderline",
-      "confidence": 0.6566666666666666,
-      "granted": true
+      "confidence": 0.66,
+      "granted": false
     },
     {
       "file": "outsider_yes_approve.wav",
       "predicted_member": "aderline",
-      "confidence": 0.43666666666666665,
-      "granted": true
+      "confidence": 0.44,
+      "granted": false
     }
   ]
 }

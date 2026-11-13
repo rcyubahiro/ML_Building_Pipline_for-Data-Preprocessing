@@ -55,6 +55,7 @@ python src/image_pipeline.py        # -> data/image_features.csv
 python src/audio_pipeline.py        # -> data/audio_features.csv
 python src/train_face.py
 python src/train_voice.py
+python src/train_product.py
 python src/app.py --demo             # authorized + unauthorized attempts
 ```
 
@@ -67,6 +68,12 @@ join after normalizing `customer_id_new` and `customer_id_legacy`. Product
 metrics include accuracy, macro-F1, and log loss. Duplicate social profiles
 for one normalized customer are reduced to one profile before joining to avoid
 many-to-many row inflation.
+
+Integration evidence is documented in `reports/member4_integration_report.md`.
+The shared model results table is `reports/model_evaluation.csv`, and the multimodal
+flowchart is `reports/multimodal_flowchart.mmd`. The application validates all three
+model bundles at startup and only runs the product model after face and voice checks
+pass. `data/member_customer_map.csv` links each demo member to a customer record.
 
 Notebooks can be opened from anywhere; they switch to the repo root automatically.
 

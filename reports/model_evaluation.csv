@@ -1,0 +1,4 @@
+model,algorithm,validation,accuracy,f1_macro,loss,notes
+face,LogisticRegression,Leave-one-expression-out CV,1.000,1.000,0.013,"Current three-member image dataset; regenerate after adding the fourth member"
+voice,RandomForestClassifier,Leave-one-phrase-out CV,0.719,0.651,0.931,"Voice acceptance threshold set to 0.75 for transaction gating"
+product,RandomForestClassifier,20% stratified holdout,0.292,0.246,1.960,"Model trained from the cleaned 117-row customer dataset"

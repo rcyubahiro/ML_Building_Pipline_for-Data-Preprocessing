@@ -25,6 +25,8 @@ SIZE = 128  # faces are resized to SIZE x SIZE before feature extraction
 
 def _load_cascade():
     name = "haarcascade_frontalface_default.xml"
+    if not hasattr(cv2, "CascadeClassifier"):
+        return None
     candidates = []
     if getattr(cv2, "data", None):
         candidates.append(Path(cv2.data.haarcascades) / name)
@@ -38,7 +40,7 @@ def _load_cascade():
 
 
 _cascade = _load_cascade()
-if _cascade.empty():
+if _cascade is None or _cascade.empty():
     print("[warn] Haar face cascade not found; using the full image instead of a face crop.")
 
 
@@ -68,7 +70,9 @@ def load_images(folder):
 def crop_face(bgr):
     """Crop the largest detected face; fall back to the full image if none is found."""
     gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
-    faces = [] if _cascade.empty() else _cascade.detectMultiScale(gray, 1.1, 5, minSize=(60, 60))
+    faces = [] if _cascade is None or _cascade.empty() else _cascade.detectMultiScale(
+        gray, 1.1, 5, minSize=(60, 60)
+    )
     if len(faces):
         x, y, w, h = max(faces, key=lambda f: f[2] * f[3])
         bgr = bgr[y:y + h, x:x + w]

@@ -11,18 +11,22 @@ from sklearn.model_selection import train_test_split
 
 from common import candidate_models, pick_best, print_results, save_metrics, score
 
-DROP = ["customer_id", "transaction_id", "purchase_date", "amount_bucket", "product_category"]
+DROP = [
+    "customer_id", "customer_id_legacy", "customer_id_new", "transaction_id",
+    "purchase_date", "amount_bucket", "product_category",
+]
 TARGET = "product_category"
 
 
 def build_X(df):
     X = df.drop(columns=[c for c in DROP if c in df.columns])
-    return pd.get_dummies(X, columns=["top_platform"], dtype=int)
+    categorical = X.select_dtypes(include=["object", "string", "category"]).columns.tolist()
+    return pd.get_dummies(X, columns=categorical, dtype=int)
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--data", default="data/merged_dataset.csv")
+    ap.add_argument("--data", default="data/clean_merged_customer_dataset.csv")
     ap.add_argument("--out", default="models/product_model.pkl")
     a = ap.parse_args()
 
