@@ -12,11 +12,11 @@ Start -> Face recognition -> Product model -> Voice validation -> Display predic
 
 | Task | What | Owner |
 |---|---|---|
-| 1 | Data merge + EDA (`customer_social_profiles` + `customer_transactions`) | _name_ |
+| 1 | Data merge + EDA (`customer_social_profiles` + `customer_transactions`) | Sandrine |
 | 2 | Image collection, augmentation, features (`image_features.csv`) | Robert|
 | 3 | Audio collection, augmentation, features (`audio_features.csv`), voice model | Aderline |
-| 4 | Models: face, voice, product | _name_ |
-| 6 | System demo (CLI app, unauthorized attempt, video) | _name_ |
+| 4 | Models: face, voice, product |Eloi(Elox),Sandrine,Adreline and Robert|
+| 6 | System demo (CLI app, unauthorized attempt, video) | Eloi(Elox)|
 
 Team members whose face and voice are in the dataset: **Elox, Aderline, Sandrine**.
 
