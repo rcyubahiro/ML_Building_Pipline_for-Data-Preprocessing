@@ -13,7 +13,7 @@ Start -> Face recognition -> Product model -> Voice validation -> Display predic
 | Task | What | Owner |
 |---|---|---|
 | 1 | Data merge + EDA (`customer_social_profiles` + `customer_transactions`) | _name_ |
-| 2 | Image collection, augmentation, features (`image_features.csv`) | Chriss |
+| 2 | Image collection, augmentation, features (`image_features.csv`) | Robert|
 | 3 | Audio collection, augmentation, features (`audio_features.csv`), voice model | Aderline |
 | 4 | Models: face, voice, product | _name_ |
 | 6 | System demo (CLI app, unauthorized attempt, video) | _name_ |
