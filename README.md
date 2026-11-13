@@ -14,7 +14,7 @@ Start -> Face recognition -> Product model -> Voice validation -> Display predic
 |---|---|---|
 | 1 | Data merge + EDA (`customer_social_profiles` + `customer_transactions`) | _name_ |
 | 2 | Image collection, augmentation, features (`image_features.csv`) | Chriss |
-| 3 | Audio collection, augmentation, features (`audio_features.csv`) | _name_ |
+| 3 | Audio collection, augmentation, features (`audio_features.csv`), voice model | Aderline |
 | 4 | Models: face, voice, product | _name_ |
 | 6 | System demo (CLI app, unauthorized attempt, video) | _name_ |
 
@@ -89,3 +89,4 @@ Each member adds a short paragraph on their own contribution below.
 
 - **Task 2 (Robert):** collected and standardized the facial images (3 expressions per member), preprocessed them (face crop, 128x128, grayscale), applied five augmentations (rotation +/-15 degrees, flip, Gaussian blur, brightness), extracted intensity-histogram and HOG features into `data/image_features.csv`, and wrote `src/image_pipeline.py` and `notebooks/task2_image_processing.ipynb`.
 - **Task 1 (Data Lead):** completed in `notebooks/task1_customer_data_eda_cleaning_product_model.ipynb`; cleaned and merged the supplied workbooks, generated EDA summaries and labeled plots under `reports/`, and trained the Random Forest product model.
+- **Task 3 (Aderline):** converted the team's phone recordings (AAC/Opus, 16–48 kHz) to mono `.wav` with the repo naming, checked quality (clipping, SNR, length), trimmed silence, peak-normalised and resampled everything to 16 kHz; plotted a waveform and spectrogram per recording; applied seven augmentations (pitch ±2 semitones, speed ±10%, noise, volume, time shift); extracted MFCC 1–13 (mean/std), roll-off, RMS energy and pitch into `data/audio_features.csv`; trained the Random Forest voice verification model with a leave-one-phrase-out evaluation (`src/audio_pipeline.py`, `src/train_voice.py`, `notebooks/task3_audio_processing.ipynb`).

@@ -1,0 +1,104 @@
+{
+  "model": "voice_verification",
+  "algorithm": "RandomForestClassifier (StandardScaler first)",
+  "hyperparameters": {
+    "n_estimators": 300,
+    "max_depth": null,
+    "min_samples_leaf": 1,
+    "random_state": 42
+  },
+  "split": "leave-one-phrase-out (train on one phrase, test on the other)",
+  "members": [
+    "aderline",
+    "robert",
+    "sandrine"
+  ],
+  "rows": 48,
+  "features": 32,
+  "mean_over_folds": {
+    "accuracy": 0.6458333333333334,
+    "f1_macro": 0.5878508608943391,
+    "log_loss": 0.8435295907610443
+  },
+  "folds": [
+    {
+      "train_phrase": "confirm_transaction",
+      "test_phrase": "yes_approve",
+      "train_rows": 24,
+      "test_rows": 24,
+      "accuracy": 0.5833333333333334,
+      "f1_macro": 0.5364102564102564,
+      "log_loss": 0.8779251238347684,
+      "genuine_confidence_min": 0.3566666666666667,
+      "confusion_matrix": [
+        [
+          5,
+          2,
+          1
+        ],
+        [
+          0,
+          8,
+          0
+        ],
+        [
+          0,
+          7,
+          1
+        ]
+      ],
+      "labels": [
+        "aderline",
+        "robert",
+        "sandrine"
+      ]
+    },
+    {
+      "train_phrase": "yes_approve",
+      "test_phrase": "confirm_transaction",
+      "train_rows": 24,
+      "test_rows": 24,
+      "accuracy": 0.7083333333333334,
+      "f1_macro": 0.639291465378422,
+      "log_loss": 0.80913405768732,
+      "genuine_confidence_min": 0.36666666666666664,
+      "confusion_matrix": [
+        [
+          8,
+          0,
+          0
+        ],
+        [
+          0,
+          8,
+          0
+        ],
+        [
+          7,
+          0,
+          1
+        ]
+      ],
+      "labels": [
+        "aderline",
+        "robert",
+        "sandrine"
+      ]
+    }
+  ],
+  "acceptance_threshold": 0.36,
+  "unauthorized_checks": [
+    {
+      "file": "outsider_confirm_transaction.wav",
+      "predicted_member": "aderline",
+      "confidence": 0.7833333333333333,
+      "granted": true
+    },
+    {
+      "file": "outsider_yes_approve.wav",
+      "predicted_member": "aderline",
+      "confidence": 0.47,
+      "granted": true
+    }
+  ]
+}
