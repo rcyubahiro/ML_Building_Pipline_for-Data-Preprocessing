@@ -5,7 +5,7 @@ __pycache__/
 venv/
 .ipynb_checkpoints/
 
-# Trained models are rebuilt with the train_*.py scripts
+
 
 
 # OS / editor
